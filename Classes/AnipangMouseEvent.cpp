@@ -1,19 +1,19 @@
 #include"headers.h"
-#include"AnipangMouseEvent.h"
 #include"AnipangManager.h"
+#include"AnipangMouseEvent.h"
 #include"AnipangMap.h"
 #include "AnipangGameScene.h"
-AnipangMouseEvent::AnipangMouseEvent(const shared_ptr<AnipangManager>& manager)
+AnipangMouseEvent::AnipangMouseEvent()
 {
 	isMove = false;
 	isOnClick = false;
-	_manager = manager;
 	_mouseListener = EventListenerMouse::create();
 	_mouseListener->onMouseDown = CC_CALLBACK_1(AnipangMouseEvent::onMouseDown, this);
 	_mouseListener->onMouseUp = CC_CALLBACK_1(AnipangMouseEvent::onMouseUp, this);
 	_mouseListener->onMouseMove = CC_CALLBACK_1(AnipangMouseEvent::onMouseMove, this);
 	_mouseListener->onMouseScroll = CC_CALLBACK_1(AnipangMouseEvent::onMouseScroll, this);
-	auto scene = _manager.lock()->getScene();
+	AnipangManager& _manager = AnipangManager::instance();
+	auto scene = _manager.getScene();
 	scene->getEventDispatcher()->addEventListenerWithSceneGraphPriority(_mouseListener, scene);
 	setBackground();
 }
@@ -22,7 +22,7 @@ AnipangMouseEvent::~AnipangMouseEvent() {
 }
 Sprite * AnipangMouseEvent::setBackground()
 {
-	return background = _manager.lock()->getAnipangMap()->getBackgroundNode();
+	return background = AnipangManager::instance().getAnipangMap()->getBackgroundNode();
 }
 
 int AnipangMouseEvent::getIndexXPosition(cocos2d::Event * event) throw (IndexOutOfException)
@@ -47,6 +47,7 @@ int AnipangMouseEvent::getIndexYPosition(cocos2d::Event * event) throw (IndexOut
 
 void  AnipangMouseEvent::onMouseDown(cocos2d::Event * event) 
 {
+	AnipangManager& _manager = AnipangManager::instance();
 	try {
 		clickX = getIndexXPosition(event);
 		clickY = getIndexYPosition(event);
@@ -54,12 +55,12 @@ void  AnipangMouseEvent::onMouseDown(cocos2d::Event * event)
 	catch (IndexOutOfException e) {
 		e.showIndexOfOutExceptionMessage();
 	}
-	auto _map = _manager.lock()->getAnipangMap();
+	auto _map = _manager.getAnipangMap();
 	isOnClick = true;
 	if (_map->_IntegerManagerMap[clickY][clickX]->getType() == SWORD) {
 		isMove = false;
-		_manager.lock()->getScene()->GAME_STATE = SWORD_PANG;
-		_manager.lock()->getScene()->scheduleUpdate();
+		_manager.getScene()->GAME_STATE = SWORD_PANG;
+		_manager.getScene()->scheduleUpdate();
 	}
 	else isMove = true;
 	
@@ -73,17 +74,18 @@ void  AnipangMouseEvent::onMouseUp(cocos2d::Event * event)
 
 void  AnipangMouseEvent::onMouseMove(cocos2d::Event * event)
 {
+	AnipangManager& _manager = AnipangManager::instance();
 	if (isOnClick && isMove && afterMouseClickAndFinishAction) { //클릭이 되어있다면...해야할 것은 각 맵의 값들을 바꿔줘야함.. 그리고 드래그시 그방향으로 1번만 움직이게. 
 		try {
 			EventMouse* e = (EventMouse*)event;
 			dragX = getIndexXPosition(event); dragY = getIndexYPosition(event);
-			auto _map = _manager.lock()->getAnipangMap();
+			auto _map = _manager.getAnipangMap();
 			if (_map->_IntegerManagerMap[dragY][dragX]->getType() == SWORD) return;
 			if (clickX == dragX && clickY == dragY) return; // 같은 위치 함수 종료
 			if (!checkNonMovable()) { // 대각선 제외 해야함. 일어날확률 거의 없지만...
 				isMove = false;
 				afterMouseClickAndFinishAction = false;
-				_manager.lock()->getScene()->GAME_STATE = SWAP;
+				_manager.getScene()->GAME_STATE = SWAP;
 			}	
 		}
 		catch (IndexOutOfException e) {

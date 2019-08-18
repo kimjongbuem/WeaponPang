@@ -1,19 +1,21 @@
 #include"headers.h"
-#include"AnipangAction.h"
 #include"AnipangManager.h"
+#include"AnipangAction.h"
+//#include"AnipangManager.h"
 #include"AnipangMap.h"
 #include"AnipangMouseEvent.h"
 #include"AnipangGameScene.h"
 #include "AnipangFactory.h"
-AnipangAction::AnipangAction(shared_ptr<AnipangManager>& manager)
+AnipangAction::AnipangAction()
 {
-	_manager = manager;
-	_map = _manager.lock()->getAnipangMap();
+	AnipangManager & _manager = AnipangManager::instance();
+	_map = _manager.getAnipangMap();
 }
 
 bool AnipangAction::swap()
 {
-	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.lock()->getAnipangMouseEvent();
+	AnipangManager & _manager = AnipangManager::instance();
+	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.getAnipangMouseEvent();
 	clickX = _mouseEvent.lock()->getClickX();
 	clickY = _mouseEvent.lock()->getClickY();
 	dragX = _mouseEvent.lock()->getdragX();
@@ -64,6 +66,7 @@ bool AnipangAction::swap()
 
 void AnipangAction::deleteBingo()
 {
+	AnipangManager & _manager = AnipangManager::instance();
 	_map->setCombo(_map->getCombo() + 1);
 	_map->checkAndSetIntegerBingo(); // 해당 type, cnt를 설정.
 	for (int col = MIN_COL_INDEX; col <= MAX_COL_INDEX; col++) {
@@ -80,8 +83,8 @@ void AnipangAction::deleteBingo()
 				_map->_checkWeaponMap[col][row]->weaponSprite->removeFromParent();
 				_map->_checkWeaponMap[col][row] = nullptr;
 				_map->_checkWeaponMap[col][row] = make_shared<Weapon>();
-				_manager.lock()->getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[col][row], _map->_IntegerManagerMap[col][row]->getType());
-				_map->_checkWeaponMap[col][row]->type = _manager.lock()->getAnipangFactory()->setWeaponType(_map->_IntegerManagerMap[col][row]->getType());
+				_manager.getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[col][row], _map->_IntegerManagerMap[col][row]->getType());
+				_map->_checkWeaponMap[col][row]->type = _manager.getAnipangFactory()->setWeaponType(_map->_IntegerManagerMap[col][row]->getType());
 				_map->_checkWeaponMap[col][row]->weaponSprite->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 				_map->_checkWeaponMap[col][row]->weaponSprite->setPosition(Vec2(row*BLOCK_SIZE, col*BLOCK_SIZE));
 				_map->_checkWeaponMap[col][row]->weaponSprite->setVisible(true);
@@ -136,25 +139,26 @@ void AnipangAction::reSwap()
 
 void AnipangAction::actionClickMoveFinished()
 {
+	AnipangManager & _manager = AnipangManager::instance();
 	_map->_checkWeaponMap[clickY][clickX]->weaponSprite->retain();
 	_map->_checkWeaponMap[clickY][clickX]->weaponSprite->removeFromParent();
 	_map->_checkWeaponMap[clickY][clickX]->weaponSprite->setPosition(Vec2(changeTmpX1, changeTmpY1));
 	_map->getBackgroundNode()->addChild(_map->_checkWeaponMap[clickY][clickX]->weaponSprite);
 	if (_map->_IntegerManagerMap[clickY][clickX]->getType() == BOOK) {
 		_map->storeSpeicalBookIndex(dragY, dragX);
-		_manager.lock()->getScene()->specialBook = true;
+		_manager.getScene()->specialBook = true;
 	}
 
 	else if (_map->_IntegerManagerMap[dragY][dragX]->getType() == BOOK) {
 		_map->storeSpeicalBookIndex(clickY, clickX);
-		_manager.lock()->getScene()->specialBook = true;
+		_manager.getScene()->specialBook = true;
 	}
 
-	if (_map->_IntegerManagerMap[dragY][dragX]->getType() == BOOK && _map->_IntegerManagerMap[clickY][clickX]->getType() == BOOK) _manager.lock()->getScene()->specialBook = false;
-	_manager.lock()->getScene()->firstSwapCheck = true;
+	if (_map->_IntegerManagerMap[dragY][dragX]->getType() == BOOK && _map->_IntegerManagerMap[clickY][clickX]->getType() == BOOK) _manager.getScene()->specialBook = false;
+	_manager.getScene()->firstSwapCheck = true;
 	_map->updateIntegerCheckMapRowAndColCnt(); // 갱신 //
-	_manager.lock()->getScene()->GAME_STATE = CHECK_MATCHING;
-	_manager.lock()->getScene()->scheduleUpdate();
+	_manager.getScene()->GAME_STATE = CHECK_MATCHING;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangAction::actionDragMoveFinished()
@@ -168,14 +172,15 @@ void AnipangAction::actionDragMoveFinished()
 
 void AnipangAction::reSwapClickMoveFinsided()
 {
+	AnipangManager & _manager = AnipangManager::instance();
 	_map->_checkWeaponMap[dragY][dragX]->weaponSprite->retain();
 	_map->_checkWeaponMap[dragY][dragX]->weaponSprite->removeFromParent();
 	_map->_checkWeaponMap[dragY][dragX]->weaponSprite->setPosition(Vec2(changeTmpX2, changeTmpY2));
 	_map->getBackgroundNode()->addChild(_map->_checkWeaponMap[dragY][dragX]->weaponSprite);
 	_map->updateIntegerCheckMapRowAndColCnt();
-	_manager.lock()->getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
-	_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-	_manager.lock()->getScene()->scheduleUpdate();
+	_manager.getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
+	_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangAction::reSwapDragMoveFinsided()
@@ -188,8 +193,9 @@ void AnipangAction::reSwapDragMoveFinsided()
 
 void AnipangAction::drop()
 {
+	AnipangManager & _manager = AnipangManager::instance();
 	isDrop = false;
-	_manager.lock()->getScene()->specialBook = false;
+	_manager.getScene()->specialBook = false;
 	for (int col = MIN_COL_INDEX; col <= MAX_COL_INDEX - 1; col++) {
 		for (int row = MIN_ROW_INDEX; row <= MAX_ROW_INDEX; row++) {
 			if (_map->_IntegerManagerMap[col][row]->getType() == NONE) { // 해당 타입이 없다면..
@@ -243,8 +249,9 @@ void AnipangAction::dropAction()
 
 void AnipangAction::convertMap()
 {
+	AnipangManager & _manager = AnipangManager::instance();
 	_map->convertMap();
-	_manager.lock()->getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
+	_manager.getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
 }
 
 void AnipangAction::checkMatching()
@@ -254,7 +261,8 @@ void AnipangAction::checkMatching()
 
 void AnipangAction::bookPang()
 {
-	_manager.lock()->getScene()->specialBook = false;
+	AnipangManager & _manager = AnipangManager::instance();
+	_manager.getScene()->specialBook = false;
 	_map->setCombo(_map->getCombo() + 1);
 	int specialBookIndexX = _map->getSpeicalBookIndexX();
 	int specialBookIndexY = _map->getSpeicalBookIndexY();
@@ -281,7 +289,8 @@ void AnipangAction::bookPang()
 
 void AnipangAction::swordPang()
 {
-	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.lock()->getAnipangMouseEvent();
+	AnipangManager & _manager = AnipangManager::instance();
+	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.getAnipangMouseEvent();
 	clickX = _mouseEvent.lock()->getClickX();
 	clickY = _mouseEvent.lock()->getClickY();
 	auto deleteDelay = DelayTime::create(duration * 0.35f);
@@ -326,16 +335,18 @@ void AnipangAction::deletebyPangOfSpecial()
 
 void AnipangAction::dropIsCheckedIsChangingState()
 {
-	_manager.lock()->getScene()->GAME_STATE = CHECK_MATCHING;
-	_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-	_manager.lock()->getScene()->scheduleUpdate();
+	AnipangManager & _manager = AnipangManager::instance();
+	_manager.getScene()->GAME_STATE = CHECK_MATCHING;
+	_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangAction::dropCheckingChangeNewProduceState()
 {
-	_manager.lock()->getScene()->GAME_STATE = NEW_PRODUCE;
-	_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-	_manager.lock()->getScene()->scheduleUpdate();
+	AnipangManager & _manager = AnipangManager::instance();
+	_manager.getScene()->GAME_STATE = NEW_PRODUCE;
+	_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangAction::delayDeleting(int col, int row)
@@ -345,8 +356,9 @@ void AnipangAction::delayDeleting(int col, int row)
 	_map->_checkWeaponMap[col][row]->weaponSprite->removeFromParent();
 	_map->_checkWeaponMap[col][row] = nullptr;
 
-	_manager.lock()->getScene()->firstSwapCheck = false;
-	_manager.lock()->getScene()->GAME_STATE = DROP;
+	AnipangManager & _manager = AnipangManager::instance();
+	_manager.getScene()->firstSwapCheck = false;
+	_manager.getScene()->GAME_STATE = DROP;
 	//_manager.lock()->getScene()->scheduleUpdate();
 }
 
@@ -355,6 +367,7 @@ void AnipangAction::delayNormalAndBookDeleting(int col, int row)
 	delayDeleting(col, row);
 	auto chunk = _map->getBigLumpPuzzle();
 	short rowIndex = (chunk->getStartRowIndex() + chunk->getEndRowIndex()) / 2;
+	AnipangManager & _manager = AnipangManager::instance();
 	if (_map->getCombo() == 5 && row == rowIndex) {
 		CCLOG("5_COMBO");
 		short colIndex = chunk->getStartColIndex();
@@ -362,8 +375,8 @@ void AnipangAction::delayNormalAndBookDeleting(int col, int row)
 		auto background = _map->getBackgroundNode();
 		_map->_IntegerManagerMap[chunk->getStartColIndex()][rowIndex]->setType(SWORD); // 같은 위치에 추가한다.
 		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex] = make_shared<Weapon>();
-		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex]->type = _manager.lock()->getAnipangFactory()->setWeaponType(SWORD);
-		_manager.lock()->getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex], SWORD);
+		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex]->type = _manager.getAnipangFactory()->setWeaponType(SWORD);
+		_manager.getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex], SWORD);
 		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex]->weaponSprite->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex]->weaponSprite->setPosition(Vec2(rowIndex*BLOCK_SIZE, colIndex*BLOCK_SIZE));
 		_map->_checkWeaponMap[chunk->getStartColIndex()][rowIndex]->weaponSprite->setVisible(true);
@@ -371,13 +384,13 @@ void AnipangAction::delayNormalAndBookDeleting(int col, int row)
 		
 		_map->setCombo(0); // 콤보 0
 	}
-
-	_manager.lock()->getScene()->scheduleUpdate();
+	_manager.getScene()->scheduleUpdate();
 }
 void AnipangAction::delaySwordDeleting(int col, int row)
 {
 	delayDeleting(col, row);
-	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.lock()->getAnipangMouseEvent();
+	AnipangManager & _manager = AnipangManager::instance();
+	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.getAnipangMouseEvent();
 	clickX = _mouseEvent.lock()->getClickX();
 	clickY = _mouseEvent.lock()->getClickY();
 	auto background = _map->getBackgroundNode();
@@ -385,14 +398,14 @@ void AnipangAction::delaySwordDeleting(int col, int row)
 		CCLOG("5_COMBO_sword");
 		_map->_IntegerManagerMap[clickY][clickX]->setType(SWORD); // 같은 위치에 추가한다.
 		_map->_checkWeaponMap[clickY][clickX] = make_shared<Weapon>();
-		_map->_checkWeaponMap[clickY][clickX]->type = _manager.lock()->getAnipangFactory()->setWeaponType(SWORD);
-		_manager.lock()->getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[clickY][clickX], _map->_checkWeaponMap[clickY][clickX]->type->getType());
+		_map->_checkWeaponMap[clickY][clickX]->type = _manager.getAnipangFactory()->setWeaponType(SWORD);
+		_manager.getAnipangFactory()->setWeaponSprite(_map->_checkWeaponMap[clickY][clickX], _map->_checkWeaponMap[clickY][clickX]->type->getType());
 		_map->_checkWeaponMap[clickY][clickX]->weaponSprite->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 		_map->_checkWeaponMap[clickY][clickX]->weaponSprite->setPosition(Vec2(row*BLOCK_SIZE, col*BLOCK_SIZE));
 		_map->_checkWeaponMap[clickY][clickX]->weaponSprite->setVisible(true);
 		background->addChild(_map->_checkWeaponMap[clickY][clickX]->weaponSprite, WEAPON_Z_ORDER_VALUE);
 		_map->setCombo(0); // 콤보 0
 	}
-	_manager.lock()->getScene()->scheduleUpdate();
+	_manager.getScene()->scheduleUpdate();
 }
 

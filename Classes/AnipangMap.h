@@ -6,7 +6,7 @@ class Effect;
 class ComboStore;
 class AnipangMap{
 public:
-	AnipangMap(const shared_ptr<AnipangManager>& manager);
+	AnipangMap();
 	~AnipangMap();
 public:
 	void init(AnipangGameScene* scene);
@@ -16,7 +16,6 @@ public:
 	void produceNewFactor();
 private:
 	cocos2d::Sprite* background;
-	weak_ptr<AnipangManager> _manager;
 	weak_ptr<AnipangAction> _action;
 	unique_ptr<Effect> _effect;
 	vector<FindUsingBingo*> _randomBingoStore;

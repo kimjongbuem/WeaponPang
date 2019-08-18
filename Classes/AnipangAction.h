@@ -28,7 +28,7 @@ public:
 
 class AnipangAction {
 public:
-	AnipangAction(shared_ptr<AnipangManager>& manager);
+	AnipangAction();
 	bool swap();
 	void deleteBingo();
 	void reSwap();
@@ -45,7 +45,6 @@ public:
 	void bookPang();
 	void swordPang();
 private:
-	weak_ptr<AnipangManager> _manager;
 	shared_ptr<AnipangMap> _map;
 private:
 	ClickDragIndex* cdIndex;

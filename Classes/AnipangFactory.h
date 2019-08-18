@@ -4,7 +4,7 @@ class AnipangMap; // 왜냐하면 맵을 통해 넣고 백그라운드 이미지가 부모 스프라이트
 
 class AnipangFactory {
 public:
-	AnipangFactory(const shared_ptr<AnipangManager>& manager);
+	AnipangFactory();
 	~AnipangFactory();
 	void settingMap();
 	int getRandomType() throw(IndexOutOfException);
@@ -22,5 +22,4 @@ public:
 private:
 	array<int, 7> _emptyColCnt;
 	shared_ptr<AnipangMap> _map;
-	weak_ptr<AnipangManager> _manager;
 };

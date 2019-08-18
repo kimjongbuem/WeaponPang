@@ -28,9 +28,9 @@ bool AnipangGameScene::init()
 		"CloseSelected.png",
 		CC_CALLBACK_1(AnipangGameScene::menuCloseCallback, this));
 	
-	_manager = make_shared<AnipangManager>();
-	_manager->init(this);
-	_action = _manager->getAnipangAction();
+	AnipangManager& _manager = AnipangManager::instance();
+	_manager.init(this);
+	_action = _manager.getAnipangAction();
 	_newTime = 0.0f;
 	this->scheduleUpdate();
 	return true;
@@ -46,13 +46,13 @@ void AnipangGameScene::menuCloseCallback(cocos2d::Ref * pSender)
 
 void AnipangGameScene::update(float delta)
 {
-	
+	AnipangManager& _manager = AnipangManager::instance();
 
 	if (GAME_STATE != VIEW_DELETEABLE_BINGO)
 		_newTime = 0.0f;
 
 	else if(GAME_STATE != NOTHING)
-		_manager->getAnipangMap()->turnoff_Effect();
+		_manager.getAnipangMap()->turnoff_Effect();
 
 
 	_newTime += delta;
@@ -92,10 +92,10 @@ void AnipangGameScene::update(float delta)
 		break;
 	case NEW_PRODUCE:
 		unscheduleUpdate();
-		_manager->getAnipangMap()->produceNewFactor();
+		_manager.getAnipangMap()->produceNewFactor();
 		break;
 	case VIEW_DELETEABLE_BINGO: //  유저의 입력대기상태 4초후..
-		_manager->getAnipangMap()->showFindEffect(isShow);
+		_manager.getAnipangMap()->showFindEffect(isShow);
 		break;
 	case CHANGE_MAP:
 		_action->convertMap();
@@ -103,4 +103,5 @@ void AnipangGameScene::update(float delta)
 	case NOTHING:
 		break;
 	}
+
 }

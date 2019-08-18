@@ -9,13 +9,13 @@ void AnipangManager::init(AnipangGameScene * scene)
 {
 	_scene = scene;
 	_scene->GAME_STATE = VIEW_DELETEABLE_BINGO;
-	_map = make_shared<AnipangMap>(shared_from_this());
-	_factory = make_unique<AnipangFactory>(shared_from_this());
-	_action = make_shared<AnipangAction>(shared_from_this());
+	_map = make_shared<AnipangMap>();
+	_factory = make_unique<AnipangFactory>();
+	_action = make_shared<AnipangAction>();
 	_map->init(scene);
-	_mouseEvent = make_shared<AnipangMouseEvent>(shared_from_this()); //add
+	_mouseEvent = make_shared<AnipangMouseEvent>(); //add
 }
-
+AnipangManager* AnipangManager::instance_ = new AnipangManager();
 shared_ptr<AnipangMap>& AnipangManager::getAnipangMap()
 {
 	return _map;

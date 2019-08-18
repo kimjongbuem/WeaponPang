@@ -4,7 +4,7 @@
 #include "AnipangGameScene.h"
 #include "AnipangMap.h"
 #include"AnipangManager.h"
-AnipangFactory::AnipangFactory(const shared_ptr<AnipangManager>& manager) : _manager(manager)
+AnipangFactory::AnipangFactory() 
 {
 	initializeEmptyColCntZero();
 }
@@ -36,7 +36,8 @@ unique_ptr<WeaponType> AnipangFactory::setWeaponType(int type)
 
 void AnipangFactory::settingMap()
 {
-	_map = _manager.lock()->getAnipangMap();
+	AnipangManager& _manager = AnipangManager::instance();
+	_map = _manager.getAnipangMap();
 	_map->straightenOut_checkMapValue();
 	auto background = _map->getBackgroundNode();
 	for (int col = MIN_COL_INDEX; col <= MAX_COL_INDEX; col++) {
@@ -109,7 +110,8 @@ void AnipangFactory::initializeEmptyColCntZero()
 
 void AnipangFactory::setTempProducingMap(int row)
 {
-	_map = _manager.lock()->getAnipangMap();
+	AnipangManager& _manager = AnipangManager::instance();
+	_map = _manager.getAnipangMap();
 	auto background = _map->getBackgroundNode();
 	int colMaxIndex = getEmptyColCnt(row) - 1;
 	for (int colIndex = 0; colIndex <= colMaxIndex; colIndex++) {
@@ -127,7 +129,8 @@ void AnipangFactory::setTempProducingMap(int row)
 void AnipangFactory::dropNewProducing(int row)
 {
 	float duration = 0.24f;
-	_map = _manager.lock()->getAnipangMap();
+	AnipangManager& _manager = AnipangManager::instance();
+	_map = _manager.getAnipangMap();
 	int colCnt = getEmptyColCnt(row);
 	for (int mainColIdx = colCnt - 1, newProduceColIndex = 0; mainColIdx >= 0; mainColIdx--, newProduceColIndex++) {	
 		swap(_map->_checkWeaponMap[MAX_COL_INDEX - mainColIdx][row], _map->_newProduceMap[newProduceColIndex][row]);
@@ -141,8 +144,9 @@ void AnipangFactory::dropNewProducing(int row)
 
 void AnipangFactory::dropNewProducingSetVisible(int col, int row)
 {
-	_manager.lock()->getScene()->GAME_STATE = CHECK_MATCHING;
-	_manager.lock()->getScene()->scheduleUpdate();
+	AnipangManager& _manager = AnipangManager::instance();
+	_manager.getScene()->GAME_STATE = CHECK_MATCHING;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangFactory::setWeaponSprite(shared_ptr<Weapon> weapon, int type)

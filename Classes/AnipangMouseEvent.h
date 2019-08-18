@@ -2,7 +2,6 @@
 class AnipangManager;
 class AnipangMouseEvent {
 private:
-	weak_ptr<AnipangManager> _manager; // 매니저
 	EventListenerMouse* _mouseListener;
 	cocos2d::Sprite* background;
 	bool isOnClick;
@@ -10,7 +9,7 @@ private:
 	int clickY, clickX;
 	int dragY, dragX;
 public:
-	AnipangMouseEvent(const shared_ptr<AnipangManager>& manager); // 매니저를 통해 맵을가져온다..
+	AnipangMouseEvent(); // 매니저를 통해 맵을가져온다..
 	~AnipangMouseEvent();
 	Sprite* setBackground();
 	int getIndexXPosition(cocos2d::Event * event);

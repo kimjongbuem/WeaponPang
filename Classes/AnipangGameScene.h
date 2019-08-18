@@ -20,6 +20,5 @@ private:
 	bool isShow = false;
 	CREATE_FUNC(AnipangGameScene);
 private:
-	shared_ptr<AnipangManager> _manager;
 	shared_ptr<AnipangAction> _action;
 };

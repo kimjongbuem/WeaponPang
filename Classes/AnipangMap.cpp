@@ -6,7 +6,7 @@
 #include"AnipangFactory.h"
 #include"ComboStore.h"
 #include"Effect.h"
-AnipangMap::AnipangMap(const shared_ptr<AnipangManager>& manager) :_manager(manager)
+AnipangMap::AnipangMap()
 {
 	_comboStore = new ComboStore(); // 콤보 저장 하는 애 추가...
 }
@@ -15,20 +15,23 @@ AnipangMap::~AnipangMap()
 }
 void AnipangMap::init(AnipangGameScene * scene)
 {
-	_action = _manager.lock()->getAnipangAction();
+	AnipangManager& _manager = AnipangManager::instance();
+	_action = AnipangManager::instance().getAnipangAction();
+	_action = _manager.getAnipangAction();
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	background = Sprite::create("AnipangMap.png");
 	background->setPosition(Vec2(minXValue,minYValue));
 	background->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	scene->addChild(background, 0);
-	_effect = make_unique<Effect>(_manager);
+	_effect = make_unique<Effect>();
 	setting();
 }
 
 void AnipangMap::setting()
 {
-	_manager.lock()->getAnipangFactory()->settingMap(); // 공장에서 만든것을 갖고온다!!!
+	AnipangManager& _manager = AnipangManager::instance();
+	_manager.getAnipangFactory()->settingMap(); // 공장에서 만든것을 갖고온다!!!
 }
 
 Sprite * AnipangMap::getBackgroundNode()
@@ -309,11 +312,12 @@ void AnipangMap::initializeNewProduceMap()
 
 void AnipangMap::checkMatching()
 {
-	if (_manager.lock()->getScene()->specialBook) {
-		_manager.lock()->getScene()->firstSwapCheck = false;
-		_manager.lock()->getScene()->GAME_STATE = BOOK_PANG;
-		_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-		_manager.lock()->getScene()->scheduleUpdate();
+	AnipangManager& _manager = AnipangManager::instance();
+	if (_manager.getScene()->specialBook) {
+		_manager.getScene()->firstSwapCheck = false;
+		_manager.getScene()->GAME_STATE = BOOK_PANG;
+		_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+		_manager.getScene()->scheduleUpdate();
 		return;
 	}
 	
@@ -326,24 +330,24 @@ void AnipangMap::checkMatching()
 			}
 		}
 	}
-	if(isItDeleted) _manager.lock()->getScene()->GAME_STATE = DELETE_BINGO;
-	else if (_manager.lock()->getScene()->firstSwapCheck) {
-		_manager.lock()->getScene()->GAME_STATE = RESWAP;
-		_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-		_manager.lock()->getScene()->scheduleUpdate();
+	if(isItDeleted) _manager.getScene()->GAME_STATE = DELETE_BINGO;
+	else if (_manager.getScene()->firstSwapCheck) {
+		_manager.getScene()->GAME_STATE = RESWAP;
+		_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+		_manager.getScene()->scheduleUpdate();
 		return;
 	}
 	else {
-		if(checkGettingNoneType())  _manager.lock()->getScene()->GAME_STATE = NEW_PRODUCE;
-		else _manager.lock()->getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
+		if(checkGettingNoneType())  _manager.getScene()->GAME_STATE = NEW_PRODUCE;
+		else _manager.getScene()->GAME_STATE = VIEW_DELETEABLE_BINGO;
 
-		_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-		_manager.lock()->getScene()->scheduleUpdate();
+		_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+		_manager.getScene()->scheduleUpdate();
 		return;
 	}
-	_manager.lock()->getScene()->firstSwapCheck = false;
-	_manager.lock()->getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
-	_manager.lock()->getScene()->scheduleUpdate();
+	_manager.getScene()->firstSwapCheck = false;
+	_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
+	_manager.getScene()->scheduleUpdate();
 }
 
 void AnipangMap::storeSpeicalBookIndex(int bookIndexY, int bookIndexX)
@@ -813,6 +817,7 @@ bool AnipangMap::deleteAroundSpecialBlockIsRow5BingoTrue(int col, int row)
 
 void AnipangMap::straightenOut_checkMapValue() throw (IndexOutOfException) { // 카운트값, 타입 지정 함수 , CheckMap 포인터지정.
 	
+	AnipangManager& _manager = AnipangManager::instance();
 	_IntegerManagerMap[0][0] = make_shared<CheckMap>(1, 1, 1);
 	_IntegerManagerMap[0][1] = make_shared<CheckMap>(1, 2, 1);
 	_IntegerManagerMap[0][2] = make_shared<CheckMap>(1, 1, 2);
@@ -832,7 +837,7 @@ void AnipangMap::straightenOut_checkMapValue() throw (IndexOutOfException) { // 
 	for (int col = 2; col <= MAX_COL_INDEX; col++){ // 3줄이상 나오는 애들 처음에 없게 !!
 		for (int row = MIN_ROW_INDEX; row <= MAX_ROW_INDEX; row++) {
 			int colCnt = 1, rowCnt = 1; 
-			_IntegerManagerMap[col][row] = make_shared<CheckMap>(rowCnt, colCnt,_manager.lock()->getAnipangFactory()->getRandomType());
+			_IntegerManagerMap[col][row] = make_shared<CheckMap>(rowCnt, colCnt,_manager.getAnipangFactory()->getRandomType());
 			try {
 				if (col - 1 < MIN_COL_INDEX)
 					throw IndexOutOfException();
@@ -858,7 +863,8 @@ void AnipangMap::straightenOut_checkMapValue() throw (IndexOutOfException) { // 
 	}
 }
 void AnipangMap::produceNewFactor(){
-	_manager.lock()->getAnipangFactory()->produceNewFactor();
+	AnipangManager& _manager = AnipangManager::instance();
+	_manager.getAnipangFactory()->produceNewFactor();
 }
 FindUsingBingo* AnipangMap::getRandomEffectBingoVector()
 {
