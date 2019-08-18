@@ -315,7 +315,8 @@ void AnipangMap::checkMatching()
 	AnipangManager& _manager = AnipangManager::instance();
 	if (_manager.getScene()->specialBook) {
 		_manager.getScene()->firstSwapCheck = false;
-		_manager.getScene()->GAME_STATE = BOOK_PANG;
+		_manager.getScene()->GAME_STATE = PANG;
+		_manager.getScene()->isBookPang = true;
 		_manager.getAnipangMouseEvent()->afterMouseClickAndFinishAction = true;
 		_manager.getScene()->scheduleUpdate();
 		return;

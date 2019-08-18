@@ -53,6 +53,7 @@ enum {
 	DELETE_BINGO, // 빙고삭제
 	DROP, // 퍼즐 밑으로..
 	CHECK_MATCHING,
+	PANG,
 	SWORD_PANG,
 	BOOK_PANG, // 해당 팡은 해당 5빙고가 터질때 나오는 특수블럭이 있고, 그것을 상하좌우 어떠한 1개 블럭을 스왑하면 그블럭과 일치하는 애들 모두 삭제.. 
 	NEW_PRODUCE, // 재생산 후에 블록을 빈칸으로 움직이기...

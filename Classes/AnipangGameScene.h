@@ -8,6 +8,7 @@ public:
 	virtual bool init();
 	bool specialBook = false;
 	bool firstSwapCheck = true;
+	bool isBookPang = false; bool isSwordPang = false;
 	float time = 0.0f;
 	int timeCnt = 0;
 	int GAME_STATE;

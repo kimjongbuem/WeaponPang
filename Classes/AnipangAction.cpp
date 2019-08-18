@@ -259,10 +259,20 @@ void AnipangAction::checkMatching()
 	_map->checkMatching();
 }
 
+void AnipangAction::pang()
+{
+	AnipangManager & _manager = AnipangManager::instance();
+	if (_manager.getScene()->isBookPang) { bookPang(); return;}
+
+	if (_manager.getScene()->isSwordPang) swordPang(); 
+
+}
+
 void AnipangAction::bookPang()
 {
 	AnipangManager & _manager = AnipangManager::instance();
 	_manager.getScene()->specialBook = false;
+	_manager.getScene()->isBookPang = false;
 	_map->setCombo(_map->getCombo() + 1);
 	int specialBookIndexX = _map->getSpeicalBookIndexX();
 	int specialBookIndexY = _map->getSpeicalBookIndexY();
@@ -290,10 +300,11 @@ void AnipangAction::bookPang()
 void AnipangAction::swordPang()
 {
 	AnipangManager & _manager = AnipangManager::instance();
+	_manager.getScene()->isSwordPang = false;
 	weak_ptr<AnipangMouseEvent> _mouseEvent = _manager.getAnipangMouseEvent();
 	clickX = _mouseEvent.lock()->getClickX();
 	clickY = _mouseEvent.lock()->getClickY();
-	auto deleteDelay = DelayTime::create(duration * 0.35f);
+	auto deleteDelay = DelayTime::create(2.0f);
 	_map->setCombo(_map->getCombo() + 1);
 	for (int col = MIN_COL_INDEX; col <= MAX_COL_INDEX; col++) {
 		int type1 = _map->_IntegerManagerMap[col][clickX]->getType();
@@ -303,7 +314,7 @@ void AnipangAction::swordPang()
 		_map->_IntegerManagerMap[col][clickX]->setRowCnt(NONE);
 		_map->_IntegerManagerMap[col][clickX]->setColCnt(NONE);
 		auto delayCallback = CallFunc::create(CC_CALLBACK_0(AnipangAction::delaySwordDeleting, this, col, clickX));
-		auto seq = Sequence::create(deleteDelay, delayCallback, NULL);
+		auto seq = Sequence::create(delayCallback, deleteDelay,NULL);
 		_map->_checkWeaponMap[col][clickX]->weaponSprite->runAction(seq);
 	}
 	for (int row = MIN_ROW_INDEX; row <= MAX_ROW_INDEX; row++) {
@@ -314,7 +325,7 @@ void AnipangAction::swordPang()
 		_map->_IntegerManagerMap[clickY][row]->setRowCnt(NONE);
 		_map->_IntegerManagerMap[clickY][row]->setColCnt(NONE);
 		auto delayCallback = CallFunc::create(CC_CALLBACK_0(AnipangAction::delaySwordDeleting, this, clickY, row));
-		auto seq = Sequence::create(deleteDelay, delayCallback, NULL);
+		auto seq = Sequence::create(delayCallback, deleteDelay, NULL);
 		_map->_checkWeaponMap[clickY][row]->weaponSprite->runAction(seq);
 	}
 }

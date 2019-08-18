@@ -82,13 +82,9 @@ void AnipangGameScene::update(float delta)
 		unscheduleUpdate();
 		_action->checkMatching();
 		break;
-	case BOOK_PANG:
+	case PANG:
 		unscheduleUpdate();
-		_action->bookPang();
-		break;
-	case SWORD_PANG:
-		unscheduleUpdate();
-		_action->swordPang();
+		_action->pang();
 		break;
 	case NEW_PRODUCE:
 		unscheduleUpdate();

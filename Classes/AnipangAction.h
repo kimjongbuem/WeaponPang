@@ -42,6 +42,7 @@ public:
 	void dropAction();
 	void convertMap();
 	void checkMatching();
+	void pang();
 	void bookPang();
 	void swordPang();
 private:

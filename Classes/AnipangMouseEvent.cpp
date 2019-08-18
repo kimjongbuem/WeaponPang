@@ -48,6 +48,7 @@ int AnipangMouseEvent::getIndexYPosition(cocos2d::Event * event) throw (IndexOut
 void  AnipangMouseEvent::onMouseDown(cocos2d::Event * event) 
 {
 	AnipangManager& _manager = AnipangManager::instance();
+	_manager.getAnipangMap()->turnoff_Effect();
 	try {
 		clickX = getIndexXPosition(event);
 		clickY = getIndexYPosition(event);
@@ -59,7 +60,8 @@ void  AnipangMouseEvent::onMouseDown(cocos2d::Event * event)
 	isOnClick = true;
 	if (_map->_IntegerManagerMap[clickY][clickX]->getType() == SWORD) {
 		isMove = false;
-		_manager.getScene()->GAME_STATE = SWORD_PANG;
+		_manager.getScene()->isSwordPang = true;
+		_manager.getScene()->GAME_STATE = PANG;
 		_manager.getScene()->scheduleUpdate();
 	}
 	else isMove = true;
