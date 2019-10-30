@@ -1,0 +1,10 @@
+간단한 설명:
+
+AnipangGameScene 에서 static 변수 GAME_STATE에 따라 행동 변화를 시킵니다.(매 프레임마다) -- 시작부분
+AnipangManager에서는 각 클래스별로 이동할수 있게 도와주는 역할을 합니다.
+AnipangMap은 해당 애니팡 맵에대한 메모리관리부분을 합니다.
+AnipangAction은 맵과 같이 해당 액션에대한 조건이 붙는다면 행하는 역할을 합니다. 
+AnipnagMouse는 MouseEventHandler역할을 수행합니다.
+AnipangFactory는 해당 맵에 객체들을 생성해서 위치까지 실행해주는 역할 입니다.
+
+Combo, FindUsingBingo 등등은 해당 게임로직에 대한 클래스들입니다.
